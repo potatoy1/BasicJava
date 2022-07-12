@@ -70,7 +70,7 @@ public class MemoDAO {
 		
 		ResultSet resultSet = statement.executeQuery(sql);
 		// 결과가 0 or 1(Mono)
-		MemoVO vo = null;														 //split
+		MemoVO vo = null;														  //split
 		if(resultSet.next()) {
 			int id = resultSet.getInt("id");						
 			String title = resultSet.getString("title");
@@ -105,12 +105,43 @@ public class MemoDAO {
 		int executeUpdate = statement.executeUpdate();								// 지금은 이미 쿼리가 들어가 있어서 업데이트괄호안에 아무것도 안 넣어도됨.
 		statement.close();
 		connection.close();
-		return 0;
+		return executeUpdate;
 	}
-	public int updateMemo() {
-		return 0;
+	public int updateMemo(MemoVO vo) throws Exception {
+		DriverManager.registerDriver(new OracleDriver());
+		Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","pc13","java");
+		StringBuilder builder = new StringBuilder();
+		builder.append(" UPDATE memo");
+		builder.append("     SET ");
+		builder.append("         title = ?, ");
+		builder.append("         contents = ?,");
+		builder.append("         modify_date = SYSDATE ");
+		builder.append(" WHERE ");									
+		builder.append("     id = ? ");
+		String sql = builder.toString();
+		PreparedStatement statement = connection.prepareStatement(sql);				
+		statement.setString(1, vo.getTitle());										
+		statement.setString(2, vo.getContents());
+		statement.setInt(3, vo.getId());
+		int executeUpdate = statement.executeUpdate();							
+		statement.close();
+		connection.close();
+		return executeUpdate;
 	}
-	public int deleteMemo() {
-		return 0;
+	public int deleteMemo(int deleteId) throws Exception {
+		DriverManager.registerDriver(new OracleDriver());
+		Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","pc13","java");
+		StringBuilder builder = new StringBuilder();
+		builder.append("DELETE FROM  ");
+		builder.append("memo  ");
+		builder.append("WHERE ");
+		builder.append("id = ? ");
+		String sql = builder.toString();
+		PreparedStatement statement = connection.prepareStatement(sql);				
+		statement.setInt(1,deleteId);										
+		int executeUpdate = statement.executeUpdate();							
+		statement.close();
+		connection.close();
+		return executeUpdate;
 	}
 }
